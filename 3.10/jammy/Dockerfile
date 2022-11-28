@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.16
+FROM buildpack-deps:jammy As base
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
@@ -15,48 +15,21 @@ ENV LANG C.UTF-8
 
 # runtime dependencies
 RUN set -eux; \
-	apk add --no-cache \
-		ca-certificates \
-		tzdata \
-	;
+	apt-get update; \
+  apt-get upgrade -y; \
+	apt-get install -y --no-install-recommends \
+		libbluetooth-dev \
+		tk-dev \
+		uuid-dev \
+	; \
+	rm -rf /var/lib/apt/lists/*
 
 FROM base as python-base
 
-ENV GPG_KEY E3FF2839C048B25C084DEBE9B26995E310250568
-ENV PYTHON_VERSION 3.9.15
+ENV GPG_KEY A035C8C19219BA821ECEA86B64E628F8D684696D
+ENV PYTHON_VERSION 3.10.8
 
 RUN set -eux; \
-	\
-	apk add --no-cache --virtual .build-deps \
-		gnupg \
-		tar \
-		xz \
-		\
-		bluez-dev \
-		bzip2-dev \
-		dpkg-dev dpkg \
-		expat-dev \
-		findutils \
-		gcc \
-		gdbm-dev \
-		libc-dev \
-		libffi-dev \
-		libnsl-dev \
-		libtirpc-dev \
-		linux-headers \
-		make \
-		ncurses-dev \
-		openssl-dev \
-		pax-utils \
-		readline-dev \
-		sqlite-dev \
-		tcl-dev \
-		tk \
-		tk-dev \
-		util-linux-dev \
-		xz-dev \
-		zlib-dev \
-	; \
 	\
 	wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz"; \
 	wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc"; \
@@ -77,17 +50,20 @@ RUN set -eux; \
 		--enable-optimizations \
 		--enable-option-checking=fatal \
 		--enable-shared \
+		--with-lto \
 		--with-system-expat \
 		--without-ensurepip \
 	; \
 	nproc="$(nproc)"; \
 	make -j "$nproc" \
-# set thread stack size to 1MB so we don't segfault before we hit sys.getrecursionlimit()
-# https://github.com/alpinelinux/aports/commit/2026e1259422d4e0cf92391ca2d3844356c649d0
-		EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
-		LDFLAGS="-Wl,--strip-all" \
 	; \
 	make install; \
+	\
+# enable GDB to load debugging data: https://github.com/docker-library/python/pull/701
+	bin="$(readlink -ve /usr/local/bin/python3)"; \
+	dir="$(dirname "$bin")"; \
+	mkdir -p "/usr/share/gdb/auto-load/$dir"; \
+	cp -vL Tools/gdb/libpython.py "/usr/share/gdb/auto-load/$bin-gdb.py"; \
 	\
 	cd /; \
 	rm -rf /usr/src/python; \
@@ -99,13 +75,7 @@ RUN set -eux; \
 		\) -exec rm -rf '{}' + \
 	; \
 	\
-	find /usr/local -type f -executable -not \( -name '*tkinter*' \) -exec scanelf --needed --nobanner --format '%n#p' '{}' ';' \
-		| tr ',' '\n' \
-		| sort -u \
-		| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-		| xargs -rt apk add --no-network --virtual .python-rundeps \
-	; \
-	apk del --no-network .build-deps; \
+	ldconfig; \
 	\
 	python3 --version
 
@@ -119,9 +89,9 @@ RUN set -eux; \
 	done
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 22.0.4
+ENV PYTHON_PIP_VERSION 22.2.2
 # https://github.com/docker-library/python/issues/365
-ENV PYTHON_SETUPTOOLS_VERSION 58.1.0
+ENV PYTHON_SETUPTOOLS_VERSION 63.2.0
 # https://github.com/pypa/get-pip
 ENV PYTHON_GET_PIP_URL https://github.com/pypa/get-pip/raw/66030fa03382b4914d4c4d0896961a0bdeeeb274/public/get-pip.py
 ENV PYTHON_GET_PIP_SHA256 1e501cf004eac1b7eb1f97266d28f995ae835d30250bec7f8850562703067dc6
