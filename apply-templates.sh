@@ -36,7 +36,7 @@ for version; do
 	eval "variants=( $variants )"
 
 	for dir in "${variants[@]}"; do
-		variant="$(basename "$dir")" # "buster", "windowsservercore-1809", etc
+		variant="$(basename "$dir")" # "jammy", "alpine", etc
 		export variant
 
 		case "$dir" in
