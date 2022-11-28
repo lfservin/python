@@ -9,14 +9,9 @@
       "version": "63.2.0"
     },
     "variants": [
-      "bullseye",
-      "slim-bullseye",
-      "buster",
-      "slim-buster",
-      "alpine3.16",
-      "alpine3.15",
-      "windows/windowsservercore-ltsc2022",
-      "windows/windowsservercore-1809"
+      "jammy",
+      "slim-jammy",
+      "alpine3.16"
     ],
     "version": "3.10.8"
   },
@@ -30,14 +25,9 @@
       "version": "65.5.0"
     },
     "variants": [
-      "bullseye",
-      "slim-bullseye",
-      "buster",
-      "slim-buster",
-      "alpine3.16",
-      "alpine3.15",
-      "windows/windowsservercore-ltsc2022",
-      "windows/windowsservercore-1809"
+      "jammy",
+      "slim-jammy",
+      "alpine3.16"
     ],
     "version": "3.11.0"
   },
@@ -51,14 +41,9 @@
       "version": "65.5.0"
     },
     "variants": [
-      "bullseye",
-      "slim-bullseye",
-      "buster",
-      "slim-buster",
-      "alpine3.16",
-      "alpine3.15",
-      "windows/windowsservercore-ltsc2022",
-      "windows/windowsservercore-1809"
+      "jammy",
+      "slim-jammy",
+      "alpine3.16"
     ],
     "version": "3.12.0a2"
   },
@@ -72,12 +57,9 @@
       "version": "57.5.0"
     },
     "variants": [
-      "bullseye",
-      "slim-bullseye",
-      "buster",
-      "slim-buster",
-      "alpine3.16",
-      "alpine3.15"
+      "jammy",
+      "slim-jammy",
+      "alpine3.16"
     ],
     "version": "3.7.15"
   },
@@ -91,12 +73,9 @@
       "version": "57.5.0"
     },
     "variants": [
-      "bullseye",
-      "slim-bullseye",
-      "buster",
-      "slim-buster",
-      "alpine3.16",
-      "alpine3.15"
+      "jammy",
+      "slim-jammy",
+      "alpine3.16"
     ],
     "version": "3.8.15"
   },
@@ -110,12 +89,9 @@
       "version": "58.1.0"
     },
     "variants": [
-      "bullseye",
-      "slim-bullseye",
-      "buster",
-      "slim-buster",
-      "alpine3.16",
-      "alpine3.15"
+      "jammy",
+      "slim-jammy",
+      "alpine3.16"
     ],
     "version": "3.9.15"
   }
