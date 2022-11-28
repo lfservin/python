@@ -11,9 +11,9 @@
 {{ if is_alpine then ( -}}
 FROM alpine:{{ env.variant | ltrimstr("alpine") }}
 {{ ) elif is_slim then ( -}}
-FROM debian:{{ env.variant | ltrimstr("slim-") }}-slim
+FROM ubuntu:{{ env.variant | ltrimstr("slim-") }} AS base
 {{ ) else ( -}}
-FROM buildpack-deps:{{ env.variant }}
+FROM buildpack-deps:{{ env.variant }} As base
 {{ ) end -}}
 
 # ensure local python is preferred over distribution python
@@ -33,6 +33,7 @@ RUN set -eux; \
 {{ ) else ( -}}
 RUN set -eux; \
 	apt-get update; \
+  apt-get upgrade -y; \
 	apt-get install -y --no-install-recommends \
 {{ if is_slim then ( -}}
 		ca-certificates \
@@ -46,6 +47,8 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 {{ ) end -}}
+
+FROM base as python-base
 
 ENV GPG_KEY {{
 	{
@@ -295,6 +298,8 @@ ENV PYTHON_SETUPTOOLS_VERSION {{ .setuptools.version }}
 # https://github.com/pypa/get-pip
 ENV PYTHON_GET_PIP_URL {{ .pip.url }}
 ENV PYTHON_GET_PIP_SHA256 {{ .pip.sha256 }}
+
+FROM python-base AS distributable
 
 RUN set -eux; \
 	\
