@@ -165,6 +165,7 @@ for version in "${versions[@]}"; do
 					"jammy"
 				| ., "slim-" + .), # https://github.com/docker-library/ruby/pull/142#issuecomment-320012893
 				(
+          "3.17",
 					"3.16"
 				| "alpine" + .)
 			],
