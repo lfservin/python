@@ -13,6 +13,9 @@ ENV PATH /usr/local/bin:$PATH
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG C.UTF-8
 
+# create a non-root user "wrk" with user id 8877
+RUN adduser -g "wrk" wrk
+
 # runtime dependencies
 RUN set -eux; \
 	apk add --no-cache \
